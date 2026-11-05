@@ -6,7 +6,7 @@
 html,body{height:100%;background:#0b0b0f}
 body{display:flex;justify-content:center}
 body{font-family:'Sarabun',sans-serif;color:#e9e4e6;font-size:15px;line-height:1.6}
-.app{height:100%;width:100%;max-width:1000px;display:flex;flex-direction:column;background:radial-gradient(ellipse at top,#2a0a12 0%,#0b0b0f 65%);border:1px solid #3a0f1a;border-radius:14px;overflow:hidden}
+.app{height:100%;width:100%;display:flex;flex-direction:column;background:radial-gradient(ellipse at top,#2a0a12 0%,#0b0b0f 65%);border:0;border-radius:0;overflow:hidden}
 .top{padding:16px 18px 10px;border-bottom:1px solid #2a1219;background:rgba(11,11,15,.6)}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 h2{font-family:'Kanit',sans-serif;font-weight:600;font-size:20px;color:#fff;letter-spacing:.5px;margin-right:auto}
@@ -47,10 +47,16 @@ details.st[open] summary{border-bottom:1px solid #2a1a22}
 .sy{font:600 14px 'Kanit',sans-serif;color:#cdb9be;margin:8px 0 2px}
 .lz{margin:10px 0 2px;font:500 13px 'Kanit',sans-serif;color:#eee;border:1px solid #555;background:#1a1a1d;border-radius:8px;padding:6px 10px}
 .lzb{font:500 12px 'Kanit',sans-serif;color:#111;background:#f2f2f2;border:0;border-radius:6px;padding:2px 9px;margin-left:6px;cursor:pointer}
+.goo{position:fixed;inset:0;pointer-events:none;z-index:99;filter:url(#gooF);animation:gooOut .7s ease-in 2.1s forwards}
+.goo .band{position:absolute;left:-5%;right:-5%;top:0;height:0;background:#f7f5ef;animation:band .5s ease-out forwards}
+.goo .d{position:absolute;top:0;background:#f7f5ef;border-radius:0 0 999px 999px;height:0;animation:drip var(--t) cubic-bezier(.55,.05,.7,.4) var(--dl) forwards}
+.goo .d:after{content:'';position:absolute;left:50%;bottom:-12px;width:170%;aspect-ratio:1;transform:translateX(-50%);background:#f7f5ef;border-radius:50%}
+@keyframes band{to{height:7vh}}@keyframes drip{to{height:var(--h)}}@keyframes gooOut{to{opacity:0}}
 .empty{color:#7d6e72;text-align:center;padding:40px 0}
 mark{background:#c4213d;color:#fff;border-radius:3px;padding:0 2px}
 @media(max-width:600px){.app{border-radius:0;border-left:0;border-right:0}.chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}.chip{flex:0 0 auto}.warn{display:none}.top{padding:12px 12px 8px}.list{padding:4px 12px 24px}h2{font-size:17px;width:100%}input{max-width:none}.yrs{display:none}body{font-size:14px}}
 </style>
+<svg width="0" height="0" style="position:absolute"><filter id="gooF"><feGaussianBlur in="SourceGraphic" stdDeviation="9" result="b"/><feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9"/></filter></svg>
 <div class="app">
  <div class="top">
   <div class="row"><a class="back" href="https://sites.google.com/view/lowclassunivers">← LOW CLASS UNIVERSE</a><h2>⏳ TIMELINE LCU</h2><span class="warn">⚠ เนื้อหามีสปอย</span></div>
@@ -130,8 +136,9 @@ C.onclick=e=>{const b=e.target.closest('.chip');if(!b)return;const k=b.dataset.k
 C.querySelectorAll('.chip[data-k]').forEach(x=>{if(x.dataset.k!='*')x.classList.toggle('off',!on.has(x.dataset.k))});
 document.querySelector('.seg').onclick=e=>{const b=e.target.closest('button');if(!b)return;view=b.dataset.v;document.querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x==b));render();document.getElementById('list').scrollTop=0};
 document.getElementById('q').oninput=e=>{q=e.target.value.trim();render()};
+function goo(){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;const g=document.createElement('div');g.className='goo';let h='<div class="band"></div>';const n=Math.max(10,Math.round(innerWidth/70));for(let i=0;i<n;i++){const w=14+Math.random()*34,l=(i+Math.random()*.6)/n*100;h+=`<div class="d" style="left:${l}%;width:${w}px;--h:${40+Math.random()*80}vh;--t:${(0.9+Math.random()*1.1).toFixed(2)}s;--dl:${(Math.random()*.5).toFixed(2)}s"></div>`}g.innerHTML=h;document.body.appendChild(g);setTimeout(()=>g.remove(),3000)}
 const syncChips=()=>{C.querySelectorAll('.chip[data-k]').forEach(x=>{if(x.dataset.k!='*')x.classList.toggle('off',!on.has(x.dataset.k))});document.getElementById('lzt').classList.toggle('on',on.has('lust'))};
-document.getElementById('lzt').onclick=()=>{on.has('lust')?on.delete('lust'):on.add('lust');if(!on.size)MAINK.forEach(x=>on.add(x));syncChips();render()};
+document.getElementById('lzt').onclick=()=>{if(on.has('lust'))on.delete('lust');else{on.add('lust');goo()}if(!on.size)MAINK.forEach(x=>on.add(x));syncChips();render()};
 document.getElementById('list').onclick=e=>{const lb=e.target.closest('.lzb');if(lb){on.clear();if(lb.dataset.a=='mix')MAINK.forEach(x=>on.add(x));on.add('lust');syncChips();render();return}const t=e.target.closest('.tag');if(!t)return;view='story';document.querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x.dataset.v=='story'));q='';document.getElementById('q').value='';render();const d=document.getElementById('s'+t.dataset.s);if(d){d.open=true;d.scrollIntoView({block:'start'})}};
 render();
 </script>
